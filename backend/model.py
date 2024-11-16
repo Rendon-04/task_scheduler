@@ -8,7 +8,7 @@ class User(db.Model):
     __tablename__='users'
     id= db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), nullable=False, unique=True)
-    email = db.Column(db.String(120), nulllable=False, unique=True)
+    email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(128), nullable=False)
     tasks = db.relationship('Task', backref='user', lazy=True)
 
@@ -20,12 +20,12 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     title = db.Column(db.String(120), nullable=False)
-    description = db.Column(db.text, nullable=True)
-    due_date = db.Column(db.Datetime, nullabl=False)
+    description = db.Column(db.Text, nullable=True)
+    due_date = db.Column(db.DateTime, nullable=False)
     priority = db.Column(db.String(10), nullable=False, default="Medium")
     status = db.Column(db.String(20), nullable=False, default="Pending")
-    created_at = db.Column(db.Datetime, default=datetime.utcnow)
-    updated_at = db.Column(db.Datetime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return f'<Task {self.title}>'
@@ -42,7 +42,7 @@ class Notification(db.Model):
         return f'<Notification for Task ID {self.task.id} at {self.reminder_time}>'
 
     
-def connect_to_db(flask_app, db_uri="postgresql:///citizenship_test", echo=True):
+def connect_to_db(flask_app, db_uri = "postgresql+psycopg2:///tasks", echo=True):
     flask_app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     flask_app.config["SQLALCHEMY_ECHO"] = echo = False
     flask_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
