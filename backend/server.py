@@ -1,9 +1,7 @@
 """Server for task scheduler app."""
 
 from flask import Flask
-from flask import (Flask, request, flash, session, jsonify,
-                   redirect)
-from model import connect_to_db, db
+from flask import (Flask, request, jsonify)
 from crud import create_user, create_task, get_user_by_username, get_tasks_by_user
 import os
 
@@ -18,7 +16,7 @@ db.init_app(app)
 
 # Create tables if they don't exist
 with app.app_context():
-    db.create_all()
+    db.create_all()ez
 
 
 @app.route('/register', methods=['POST'])
