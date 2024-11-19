@@ -1,7 +1,9 @@
 """Server for task scheduler app."""
 
 from flask import Flask
-from flask import (Flask, request, jsonify)
+from flask import (Flask, request, jsonify, session)
+import secrets
+from werkzeug.security import check_password_hash
 from crud import create_user, create_task, get_user_by_username, get_tasks_by_user
 from model import db, Task, User 
 from twilio.rest import Client
@@ -9,11 +11,34 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+
+# Load .env manually
+env_path = Path(__file__).parent / ".env"
+print(f"Loading .env from: {env_path}")
+load_dotenv(dotenv_path=env_path)
+
+# Manually load the file and set variables
+with open(env_path, "r") as file:
+    lines = file.readlines()
+    for line in lines:
+        if line.strip() and not line.startswith("#"):
+            key, value = line.strip().split("=", 1)
+            os.environ[key] = value
+
+# Retrieve Twilio credentials from environment variables
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
+
+if not TWILIO_ACCOUNT_SID or not TWILIO_AUTH_TOKEN or not TWILIO_PHONE_NUMBER:
+    raise ValueError("Twilio credentials are missing! Check your .env file.")
 
 app = Flask(__name__)
 
-load_dotenv(dotenv_path="backend/.env")
-
+# Secret key for session encryption
+app.secret_key = secrets.token_hex(16)
 
 # Configure the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'  # SQLite for simplicity
@@ -25,17 +50,6 @@ db.init_app(app)
 # Create tables if they don't exist
 with app.app_context():
     db.create_all() 
-
-from twilio.rest import Client
-
-# Twilio credentials from environment variables
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
-TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
-
-client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
-
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -55,6 +69,32 @@ def register():
     
     user = create_user(username, email, password)
     return jsonify({'message' : 'User registered successfully', 'user_id': user.id}), 201 
+
+@app.route('/login', methods=['POST'])
+def login():
+    """Log in a user"""
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'error': 'Username and password are required' }), 400
+    
+    # Get the user by username 
+    user = get_user_by_username(username)
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({'error': 'Invalid username or password'}), 401 
+    
+    # save user information in session 
+    session['user_id'] = user.id
+    session['username'] = user.username 
+    return jsonify({'message': 'Login successful', 'user_id': user.id}), 200
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    """Log out the current user"""
+    session.clear
+    return jsonify({'message': 'Logout successful'}), 200 
 
 @app.route('/tasks', methods=['POST'])
 def add_tasks():
@@ -151,7 +191,7 @@ def check_due_tasks():
             client.messages.create(
                 body=message_body,
                 from_=TWILIO_PHONE_NUMBER,
-                to='recipient_phone_number'  # Replace with user's phone
+                to=user.phone_number 
             )
             print(f"Notification sent for task {task.title}")
 
