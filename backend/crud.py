@@ -3,17 +3,19 @@
 from model import db, User, Task, Notification, connect_to_db
 from datetime import datetime, timedelta
 import random
+from werkzeug.security import generate_password_hash
 # import faker from Faker
 
 # fake = Faker()
 
 # User related functions
 def create_user(username, email, password, phone_number):
-    """Create and return a new user"""
-    user = User(username=username, email=email, password=password, phone_number=phone_number)
+    """Create and return a new user."""
+    hashed_password = generate_password_hash(password)
+    user = User(username=username, email=email, password=hashed_password, phone_number=phone_number)
     db.session.add(user)
     db.session.commit()
-    return user 
+    return user
 
 def get_user_by_id(user_id):
     """Get a user by their ID"""
