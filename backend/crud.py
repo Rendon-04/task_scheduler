@@ -8,9 +8,9 @@ import random
 # fake = Faker()
 
 # User related functions
-def create_user(username, email, password):
+def create_user(username, email, password, phone_number):
     """Create and return a new user"""
-    user = User(username=username, email=email, password=password)
+    user = User(username=username, email=email, password=password, phone_number=phone_number)
     db.session.add(user)
     db.session.commit()
     return user 
