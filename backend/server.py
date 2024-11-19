@@ -1,5 +1,5 @@
 """Server for task scheduler app."""
-
+from http import client
 from flask import Flask
 from flask import (Flask, request, jsonify, session)
 import secrets
@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
 from pathlib import Path
-
+from flask_cors import CORS
 
 # Load .env manually
 env_path = Path(__file__).parent / ".env"
@@ -35,7 +35,13 @@ TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 if not TWILIO_ACCOUNT_SID or not TWILIO_AUTH_TOKEN or not TWILIO_PHONE_NUMBER:
     raise ValueError("Twilio credentials are missing! Check your .env file.")
 
+# Initialize Flask app
 app = Flask(__name__)
+
+twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
+# Enable Cross-Origin Resource Sharing (CORS)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 # Secret key for session encryption
 app.secret_key = secrets.token_hex(16)
@@ -49,7 +55,7 @@ db.init_app(app)
 
 # Create tables if they don't exist
 with app.app_context():
-    db.create_all() 
+    db.create_all()
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -60,15 +66,27 @@ def register():
     password = data.get('password')
     phone_number = data.get('phone_number')
 
+    # Check for missing fields
     if not username or not email or not password or not phone_number:
-        return jsonify({'error' : 'Alle fields are required'}), 400
+        return jsonify({'error': 'All fields are required'}), 400
 
+    # Check if user already exists
     existing_user = get_user_by_username(username)
     if existing_user:
-        return jsonify({'error' : 'User already exists'}), 409
+        return jsonify({'error': 'User already exists'}), 409
     
-    user = create_user(username, email, password)
-    return jsonify({'message' : 'User registered successfully', 'user_id': user.id}), 201 
+     # Check if user already exists by email
+    existing_email = User.query.filter_by(email=email).first()
+    if existing_email:
+        return jsonify({'error': 'Email already exists'}), 409
+    
+    # Create the user
+    user = create_user(username, email, password, phone_number)
+    if not user:
+        return jsonify({'error': 'User creation failed'}), 500
+
+    return jsonify({'message': 'User registered successfully', 'user_id': user.id}), 201
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -108,6 +126,11 @@ def add_tasks():
 
     if not user_id or not title or not due_date:
         return jsonify({'error': 'User ID, title, and due date are required'}), 400
+    
+    try:
+        due_date = datetime.strptime(due_date, "%Y-%m-%d")
+    except ValueError:
+        return jsonify({"error": "Invalid due date format Use YYYY-MM-DD"}), 400 
     
     task = create_task(user_id, title, description,due_date, priority)
     return jsonify({'message': 'Task created successfully', 'task_id': task.id}), 201 
@@ -169,7 +192,7 @@ def send_notification(task_id):
 
     # Send SMS
     try:
-        message = client.messages.create(
+        message = twilio_client.messages.create(
             body=message_body,
             from_=TWILIO_PHONE_NUMBER,
             to=user.phone_number  # Use user's phone number
