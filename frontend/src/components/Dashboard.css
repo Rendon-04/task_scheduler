@@ -1,0 +1,158 @@
+/* Wrapper Styling */
+.dashboard-wrapper {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Header Styling */
+  .dashboard-header {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Form Styling */
+  .dashboard-form {
+    margin-bottom: 20px;
+  }
+  
+  .dashboard-form-group {
+    margin-bottom: 15px;
+  }
+  
+  .dashboard-input,
+  .dashboard-select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.2s ease-in-out;
+  }
+  
+  .dashboard-input:focus,
+  .dashboard-select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+  }
+  
+  .dashboard-submit-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dashboard-submit-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Task List Styling */
+  .dashboard-task-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .dashboard-task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-task-details strong {
+    font-size: 16px;
+  }
+  
+  .dashboard-task-details p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  /* Badge Styling */
+  .dashboard-task-badge {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 4px;
+  }
+  
+  .dashboard-badge-danger {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .dashboard-badge-warning {
+    background-color: #ffc107;
+    color: black;
+  }
+  
+  .dashboard-badge-success {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  /* Button Styling */
+  .dashboard-task-actions .dashboard-task-button {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    border: none;
+    color: white;
+  }
+  
+  .dashboard-btn-completed {
+    background-color: #28a745;
+  }
+  
+  .dashboard-btn-completed:hover {
+    background-color: #218838;
+  }
+  
+  .dashboard-btn-notify {
+    background-color: #ffc107;
+    color: black;
+  }
+  
+  .dashboard-btn-notify:hover {
+    background-color: #e0a800;
+  }
+  
+  .dashboard-btn-delete {
+    background-color: #dc3545;
+  }
+  
+  .dashboard-btn-delete:hover {
+    background-color: #c82333;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 576px) {
+    .dashboard-task-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .dashboard-task-actions .dashboard-task-button {
+      width: 100%;
+      margin-bottom: 5px;
+    }
+  }
+  

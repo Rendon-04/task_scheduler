@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import "/src/components/Dashboard.css"
 
 export default function Dashboard({ userId }) {
   // State for tasks and new task creation
@@ -78,12 +79,12 @@ export default function Dashboard({ userId }) {
   }, []);
 
   return (
-    <div className="container">
-      <h1>Your Tasks</h1>
-      <form onSubmit={addTask} className="mb-4">
-        <div className="mb-3">
+    <div className="dashboard-wrapper">
+      <h1 className="dashboard-header">Your Tasks</h1>
+      <form onSubmit={addTask} className="dashboard-form">
+        <div className="dashboard-form-group">
           <input
-            className="form-control"
+            className="dashboard-input"
             name="title"
             placeholder="Task Title"
             value={newTask.title}
@@ -91,9 +92,9 @@ export default function Dashboard({ userId }) {
             required
           />
         </div>
-        <div className="mb-3">
+        <div className="dashboard-form-group">
           <input
-            className="form-control"
+            className="dashboard-input"
             name="due_date"
             type="date"
             value={newTask.due_date}
@@ -101,18 +102,18 @@ export default function Dashboard({ userId }) {
             required
           />
         </div>
-        <div className="mb-3">
+        <div className="dashboard-form-group">
           <textarea
-            className="form-control"
+            className="dashboard-input"
             name="description"
             placeholder="Task Description"
             value={newTask.description}
             onChange={handleTaskChange}
           ></textarea>
         </div>
-        <div className="mb-3">
+        <div className="dashboard-form-group">
           <select
-            className="form-select"
+            className="dashboard-select"
             name="priority"
             value={newTask.priority}
             onChange={handleTaskChange}
@@ -122,36 +123,44 @@ export default function Dashboard({ userId }) {
             <option value="High">High</option>
           </select>
         </div>
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="dashboard-submit-button">
           Add Task
         </button>
       </form>
-
-      <ul className="list-group">
+  
+      <ul className="dashboard-task-list">
         {tasks.map((task) => (
-          <li key={task.id} className="list-group-item d-flex justify-content-between align-items-center">
-            <div>
+          <li key={task.id} className="dashboard-task-item">
+            <div className="dashboard-task-details">
               <strong>{task.title}</strong> - {task.due_date}
               <p>{task.description}</p>
-              <span className={`badge bg-${task.priority === "High" ? "danger" : task.priority === "Medium" ? "warning" : "success"}`}>
+              <span
+                className={`dashboard-task-badge dashboard-badge-${
+                  task.priority === "High"
+                    ? "danger"
+                    : task.priority === "Medium"
+                    ? "warning"
+                    : "success"
+                }`}
+              >
                 {task.priority}
               </span>
             </div>
-            <div>
+            <div className="dashboard-task-actions">
               <button
-                className="btn btn-success btn-sm me-2"
+                className="dashboard-task-button dashboard-btn-completed"
                 onClick={() => updateTask(task.id, { status: "Completed" })}
               >
                 Mark as Completed
               </button>
               <button
-                className="btn btn-warning btn-sm me-2"
+                className="dashboard-task-button dashboard-btn-notify"
                 onClick={() => notifyTask(task.id)}
               >
                 Notify
               </button>
               <button
-                className="btn btn-danger btn-sm"
+                className="dashboard-task-button dashboard-btn-delete"
                 onClick={() => deleteTask(task.id)}
               >
                 Delete
@@ -162,5 +171,5 @@ export default function Dashboard({ userId }) {
       </ul>
     </div>
   );
-};
+};  
 

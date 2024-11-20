@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import "/src/components/Register.css"
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -78,17 +79,20 @@ const Register = () => {
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="phone_number" className="form-label">Phone Number</label>
-          <input
-            type="text"
-            className="form-control"
-            id="phone_number"
-            name="phone_number"
-            value={formData.phone_number}
-            onChange={handleChange}
-            required
-          />
-        </div>
+            <label htmlFor="phone_number" className="form-label">Phone Number</label>
+            <p className="form-description">
+                Please provide your phone number to receive task reminders via SMS.
+            </p>
+            <input
+                type="text"
+                className="form-control"
+                id="phone_number"
+                name="phone_number"
+                value={formData.phone_number}
+                onChange={handleChange}
+                required
+            />
+            </div>
         <button type="submit" className="btn btn-primary">Register</button>
       </form>
     </div>

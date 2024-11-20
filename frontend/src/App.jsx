@@ -9,17 +9,26 @@ import Dashboard from "/src/components/Dashboard.jsx";
 
 const App = () => {
   const [userId, setUserId] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogout = () => {
+    setIsLoggedIn(false); // Update login state
+    sessionStorage.clear(); // Clear session storage (or use your method)
+  };
 
   return (
     <Router>
-      <Navbar />
+      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
       <Routes>
         {/* Registration Page */}
         <Route path="/register" element={<Register />} />
-        
+
         {/* Login Page */}
-        <Route path="/login" element={<Login setUser={setUserId} />} />
-        
+        <Route
+          path="/login"
+          element={<Login setUser={setUserId} setIsLoggedIn={setIsLoggedIn} />}
+        />
+
         {/* Protected Dashboard Page */}
         <Route
           path="/dashboard"
@@ -31,9 +40,9 @@ const App = () => {
             )
           }
         />
-        
+
         {/* Default Route */}
-        <Route path="*" element={<h1>Page Not Found</h1>} />
+        <Route path="*" element={<h1>Welcome to Task Scheduler</h1>} />
       </Routes>
     </Router>
   );
